@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer
 import torch
+from langchain.embeddings import Embeddings
 
 
 class DocumentEmbedder(Embeddings):
