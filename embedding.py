@@ -2,11 +2,9 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from langchain.embeddings.base import Embeddings
 
-# Khởi tạo mô hình Halong Embedding
 model_name = 'hiieu/halong_embedding'  # Thay đổi nếu cần sử dụng mô hình khác
 model = SentenceTransformer(model_name)
 
-# Tạo danh sách các văn bản
 texts = [
     "Deep Learning là một nhánh của học máy, sử dụng các mạng nơ-ron sâu để mô hình hóa và giải quyết các vấn đề phức tạp. "
     "Nó có nhiều ứng dụng trong thực tế như nhận diện hình ảnh, xử lý ngôn ngữ tự nhiên, và chẩn đoán y tế.",
@@ -15,7 +13,6 @@ texts = [
     "Mạng Neural học sâu học rất sâu nên được gọi là Deep Learning"
 ]
 
-# Tạo một lớp Embeddings tùy chỉnh
 class CustomEmbeddings(Embeddings):
     def __init__(self, model):
         self.model = model
@@ -26,5 +23,4 @@ class CustomEmbeddings(Embeddings):
     def embed_query(self, text):
         return self.model.encode([text])[0]
 
-# Khởi tạo CustomEmbeddings
 custom_embeddings = CustomEmbeddings(model)
