@@ -74,12 +74,17 @@ def read_vectors_db():
     db = FAISS.load_local(vector_db_path, embedding_model, allow_dangerous_deserialization=True)
     return db
 
-custom_prompt_template = """Sử dụng các thông tin sau đây để trả lời câu hỏi của người dùng.
-Nếu bạn không biết câu trả lời, chỉ cần nói rằng bạn không biết, đừng cố bịa ra câu trả lời.
-Tất cả câu trả lời của bạn đều phải trả lời bằng tiếng việt
+custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm vụ là tổng hợp thông tin từ Context để trả lời câu hỏi
+1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời "Tôi không có đủ thông tin để trả lời câu hỏi này."
+2. Không suy đoán và bịa đặt nội dung ngoài context
+3. Trả lời ngắn gọn theo gạch đầu dòng
+4. Sử dụng tiếng việt
+5. Nếu người dùng yêu cầu giải thích hoặc tương tự, hãy tìm kiếm thông tin bên ngoài bổ sung thêm và trả lời
 
 Context: {context}
 Question: {question}
+
+Câu trả lời:
 """
 
 def set_custom_prompt():
@@ -98,8 +103,6 @@ def answer_question(question):
 
     # Retrieve relevant documents
     documents = retriever.invoke(question)
-    if not documents:
-        return "Không có câu trả lời nào được tìm thấy."
 
     # Create context from documents
     context = "\n\n".join([doc.page_content for doc in documents])
@@ -112,11 +115,10 @@ def answer_question(question):
 
     gemini_bot = GeminiBot()
     answer = gemini_bot.response(prompt_context)
-    
     return answer
 
 # Ví dụ sử dụng
-user_question = "Tác giả của bài báo Thực hiện song song thuật toán AES bằng ngôn ngữ lập trình CUDA trên GPU NVIDIA là ai?"
+user_question = "Sinh viên được xét và công nhận tốt nghiệp khi đủ các điều kiện"
 answer = answer_question(user_question)
 print(answer)
 print("="*25)
