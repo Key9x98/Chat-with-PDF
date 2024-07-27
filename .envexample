@@ -1,0 +1,3 @@
+# we use python-dotenv file to hide our model and api key. Here is the example of .env file
+API_KEY = "YOUR_API_KEY"
+MODEL_NAME = "YOUR_MODEL_NAME"

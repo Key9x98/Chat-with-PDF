@@ -1,7 +1,6 @@
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from sentence_transformers import SentenceTransformer
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.docstore.document import Document
 from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
 from embedding import custom_embeddings
@@ -19,7 +18,7 @@ def create_db_from_files():
         chunk_size=512, 
         chunk_overlap=128,
         length_function=len)
-    chunks = text_splitter.split_documents(documents)   
+    chunks = text_splitter.split_documents(documents)   git
     # Create document objects from chunks
     # documents = [Document(page_content=chunk.page_content) for chunk in chunks]
     # Embedding
