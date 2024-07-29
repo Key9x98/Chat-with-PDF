@@ -1,11 +1,10 @@
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
-from sentence_transformers import SentenceTransformer
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain.docstore.document import Document
 from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
 from embedding import custom_embeddings
 from typing import List
+import re
+
 # Khai bao bien
 pdf_data_path = "data"
 vector_db_path = "vectorstores/db_faiss"
@@ -31,7 +30,17 @@ vector_db_path = "vectorstores/db_faiss"
     
 #     return chunks
 
-
+def extract_text(docs):
+    docs = re.sub(r"\n{2,}", "\n\n", docs)
+    docs = re.sub(
+        r"(\S)\n(\S)", r"\1 \2", docs
+    )
+    return docs
+# Hàm để xử lý page_content trong từng chunk
+def process_chunks(chunks):
+    for chunk in chunks:
+        chunk.page_content = extract_text(chunk.page_content)
+    return chunks
 #seperator tốt: "\n\n", "\n", " ", ".", "!", "?",""
 #chunk_size = 1024, chunk_overlap = 64
 def create_db_from_files():
@@ -40,8 +49,8 @@ def create_db_from_files():
     documents = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(
         separators=[
-            "\n\n", 
-            "\n", 
+            "\n\n",
+            "\n",
             " ", 
             ".", 
             "!", 
@@ -52,11 +61,13 @@ def create_db_from_files():
         chunk_overlap=64
     )
     chunks = text_splitter.split_documents(documents)
+    processed_chunks = process_chunks(chunks)
+    # print(processed_chunks)
     # Create document objects from chunks
     # documents = [Document(page_content=chunk.page_content) for chunk in chunks]
     # Embedding
     embedding_model = custom_embeddings
-    db = FAISS.from_documents(chunks, embedding_model)
+    db = FAISS.from_documents(processed_chunks, embedding_model)
     db.save_local(vector_db_path)
     return db
 
