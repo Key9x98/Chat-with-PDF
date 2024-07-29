@@ -10,26 +10,26 @@ from typing import List
 pdf_data_path = "data"
 vector_db_path = "vectorstores/db_faiss"
 
-def text_splitter(text: str) -> List[str]:
-    chunks = []
-    paragraphs = text.split('\n')
-    current_chunk = []
-    current_word_count = 0
+# def text_splitter(text: str) -> List[str]:
+#     chunks = []
+#     paragraphs = text.split('\n')
+#     current_chunk = []
+#     current_word_count = 0
 
-    for paragraph in paragraphs:
-        words = paragraph.split()
-        if current_word_count + len(words) >= 100:
-            if current_chunk:
-                chunks.append(' '.join(current_chunk))
-            current_chunk = words
-            current_word_count = len(words)
-        else:
-            current_chunk.extend(words)
-            current_word_count += len(words)
-    if current_chunk:
-        chunks.append(' '.join(current_chunk))
+#     for paragraph in paragraphs:
+#         words = paragraph.split()
+#         if current_word_count + len(words) >= 100:
+#             if current_chunk:
+#                 chunks.append(' '.join(current_chunk))
+#             current_chunk = words
+#             current_word_count = len(words)
+#         else:
+#             current_chunk.extend(words)
+#             current_word_count += len(words)
+#     if current_chunk:
+#         chunks.append(' '.join(current_chunk))
     
-    return chunks
+#     return chunks
 
 
 #seperator tốt: "\n\n", "\n", " ", ".", "!", "?",""
