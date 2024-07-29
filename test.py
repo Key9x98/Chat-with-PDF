@@ -21,7 +21,7 @@ generation_config = {
     "temperature": 0.05,
     "top_p": 1,
     "top_k": 1,
-    "max_output_tokens": 2048,
+    "max_output_tokens": 1024*3,
 }
 
 safety_settings = [
@@ -74,10 +74,10 @@ def read_vectors_db():
     db = FAISS.load_local(vector_db_path, embedding_model, allow_dangerous_deserialization=True)
     return db
 
-custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm vụ là tổng hợp thông tin từ Context để trả lời câu hỏi
+custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm vụ là tổng hợp thông tin trong Context để trả lời câu hỏi
 1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời "Tôi không có đủ thông tin để trả lời câu hỏi này."
-2. Không suy đoán và bịa đặt nội dung ngoài context
-3. Trả lời ngắn gọn theo gạch đầu dòng
+2. Không suy đoán và bịa đặt nội dung ngoài
+3. Trả lời đầy đủ thông tin theo Context tìm được
 4. Sử dụng tiếng việt
 5. Nếu người dùng yêu cầu giải thích hoặc tương tự, hãy tìm kiếm thông tin bên ngoài bổ sung thêm và trả lời
 
@@ -108,7 +108,7 @@ def answer_question(question):
     context = "\n\n".join([doc.page_content for doc in documents])
     print("="*25)
     print(context)
-    print("="*25)
+    # print("="*25)
     # Set custom prompt
     custom_prompt = set_custom_prompt()
     prompt_context = custom_prompt.format(context=context, question=question)
@@ -118,7 +118,7 @@ def answer_question(question):
     return answer
 
 # Ví dụ sử dụng
-user_question = "Sinh viên được xét và công nhận tốt nghiệp khi đủ các điều kiện"
+user_question = "Các trường hợp sinh viên được tạm nghỉ học"
 answer = answer_question(user_question)
 print(answer)
 print("="*25)
