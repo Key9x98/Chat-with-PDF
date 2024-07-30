@@ -19,7 +19,6 @@ class DocumentProcessor:
         return text
 
     def create_chunks(self, documents: List) -> List:
-        """Tạo các chunk từ documents."""
         text_splitter = RecursiveCharacterTextSplitter(
             separators=["\n\n", "\n", " ", ".", "!", "?", ""],
             chunk_size=512,
@@ -30,7 +29,6 @@ class DocumentProcessor:
         return [self.process_text(chunk.page_content) for chunk in chunks]
 
     def create_vector_db(self) -> FAISS:
-        """Tạo và lưu vector database từ các tệp PDF."""
         loader = DirectoryLoader(self.pdf_data_path, glob="*.pdf", loader_cls=PyPDFLoader)
         documents = loader.load()
         
@@ -41,7 +39,6 @@ class DocumentProcessor:
         return db
 
     def run(self):
-        """Chạy toàn bộ quy trình xử lý và tạo vector database."""
         return self.create_vector_db()
 
 # Test
