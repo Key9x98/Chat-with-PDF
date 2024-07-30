@@ -16,7 +16,7 @@ def main():
 
     # Biến đánh dấu xem có tệp nào đã được tải lên không
     pdf_docs = None
-
+    history_global = []
     with st.sidebar:
         st.title("Upload PDF")
         pdf_docs = st.file_uploader("You can upload multiple PDFs", type="pdf", accept_multiple_files=True)
@@ -55,7 +55,9 @@ def main():
             docs = st.session_state.vector_db.similarity_search(user_question, k=2)
             context = "\n\n".join([doc.page_content for doc in docs])
             prompt = set_custom_prompt()
-            prompt_with_context = prompt.format(context=context, question=user_question)
+            history_global.append({user_question:context})
+            history_global_str = "\n".join(history_global)
+            prompt_with_context = prompt.format(history_global= history_global_str, context=context, question=user_question)
             response = gemini_bot.response(prompt_with_context)
 
 
