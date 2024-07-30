@@ -43,7 +43,7 @@ class DocumentProcessor:
 
 # Test
 if __name__ == "__main__":
-    pdf_data_path = '/content/drive/MyDrive/PDF-Chat'
+    pdf_data_path = 'C:\\Users\\CNTT\\PDFChatbot\\Chat-with-PDF\\PDFs'
     vector_db_path = "vectorstores/db_faiss"
     
     processor = DocumentProcessor(pdf_data_path, vector_db_path)

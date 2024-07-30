@@ -3,6 +3,7 @@ import os
 
 gemini_api_secret_name = 'gemini-pro'  # @param {type: "string"}
 model = genai.GenerativeModel('gemini-pro')
+from langchain_core.prompts import PromptTemplate
 
 from dotenv import load_dotenv
 
@@ -39,6 +40,26 @@ safety_settings = [
   },
 ]
 
+custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm vụ là tổng hợp thông tin trong Context để trả lời câu hỏi
+1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời "Tôi không có đủ thông tin để trả lời câu hỏi này."
+2. Không suy đoán và bịa đặt nội dung ngoài
+3. Chỉ trả lời thông tin theo Context tìm được, một cách đầy đủ 
+4. Sử dụng tiếng việt
+
+Context: {context}
+Question: {question}
+
+Câu trả lời:
+"""
+
+
+def set_custom_prompt():
+  """
+  Prompt template for QA retrieval for each vectorstore
+  """
+  prompt = PromptTemplate(template=custom_prompt_template,
+                          input_variables=['context', 'question'])
+  return prompt
 
 class GeminiBot:
   def __init__(self):

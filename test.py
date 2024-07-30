@@ -1,7 +1,6 @@
 import google.generativeai as genai
 import os
 from langchain.chains import RetrievalQA
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
