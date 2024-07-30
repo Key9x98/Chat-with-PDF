@@ -1,8 +1,6 @@
 import google.generativeai as genai
 import os
-
-gemini_api_secret_name = 'gemini-pro'  # @param {type: "string"}
-model = genai.GenerativeModel('gemini-pro')
+import streamlit as st
 from langchain_core.prompts import PromptTemplate
 
 from dotenv import load_dotenv
@@ -10,8 +8,13 @@ from dotenv import load_dotenv
 # Load .env file
 load_dotenv()
 
-GOOGLE_API_KEY = os.getenv("API_KEY")
-MODEL_NAME =  os.getenv("MODEL_NAME")
+# GOOGLE_API_KEY = os.getenv("API_KEY")
+# MODEL_NAME =  os.getenv("MODEL_NAME")
+
+GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
+MODEL_NAME = st.secrets["MODEL_NAME"]
+
+
 print(MODEL_NAME)
 
 generation_config = {
