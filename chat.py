@@ -16,7 +16,7 @@ MODEL_NAME = st.secrets["MODEL_NAME"]
 
 
 print(MODEL_NAME)
-
+history_global = []
 generation_config = {
   "temperature": 0.05,
   "top_p": 1,
@@ -48,7 +48,7 @@ custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm v�
 2. Không suy đoán và bịa đặt nội dung ngoài
 3. Chỉ trả lời thông tin theo Context tìm được, một cách đầy đủ 
 4. Sử dụng tiếng việt
-
+5. Đây là lịch sử chat {history_global}
 Context: {context}
 Question: {question}
 
@@ -85,7 +85,7 @@ class GeminiBot:
 
   def response(self, user_input):
     user_input = user_input
-
+    history_global.append(user_input)
     input_tokens = self.model.count_tokens(user_input).total_tokens
 
     if self.token_count > 1000000:
@@ -95,7 +95,7 @@ class GeminiBot:
 
     response = self.chat.send_message(prompt + user_input)
     self.token_count += input_tokens + self.model.count_tokens(response.text).total_tokens
-
+    history_global.append(response.text)
     return response.text
 
 
