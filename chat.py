@@ -49,7 +49,7 @@ custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm v�
 2. Không suy đoán và bịa đặt nội dung ngoài
 3. Chỉ trả lời thông tin theo Context tìm được, một cách đầy đủ 
 4. Sử dụng tiếng việt
-
+5. Đây là lịch sử chat và chỉ sử dụng khi người dùng hỏi về câu hỏi trước đó {history_global}
 Context: {context}
 Question: {question}
 
