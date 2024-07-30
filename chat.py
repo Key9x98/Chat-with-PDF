@@ -42,13 +42,14 @@ safety_settings = [
     "threshold": "BLOCK_MEDIUM_AND_ABOVE"
   },
 ]
+# Chuyển đổi mảng thành chuỗi với các tin nhắn được nối nhau
 
 custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm vụ là tổng hợp thông tin trong Context để trả lời câu hỏi
 1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời "Tôi không có đủ thông tin để trả lời câu hỏi này."
 2. Không suy đoán và bịa đặt nội dung ngoài
 3. Chỉ trả lời thông tin theo Context tìm được, một cách đầy đủ 
 4. Sử dụng tiếng việt
-
+5. Đây là lịch sử chat {history_global}
 Context: {context}
 Question: {question}
 
@@ -85,7 +86,7 @@ class GeminiBot:
 
   def response(self, user_input):
     user_input = user_input
-
+    
     input_tokens = self.model.count_tokens(user_input).total_tokens
 
     if self.token_count > 1000000:
@@ -95,7 +96,7 @@ class GeminiBot:
 
     response = self.chat.send_message(prompt + user_input)
     self.token_count += input_tokens + self.model.count_tokens(response.text).total_tokens
-
+    
     return response.text
 
 
