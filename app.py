@@ -55,7 +55,7 @@ def main():
             docs = st.session_state.vector_db.similarity_search(user_question, k=2)
             context = "\n\n".join([doc.page_content for doc in docs])
             prompt = set_custom_prompt()
-            history_global.append({user_question:context})
+            history_global.append(user_question + context)
             history_global_str = "\n".join(history_global)
             prompt_with_context = prompt.format(history_global= history_global_str, context=context, question=user_question)
             response = gemini_bot.response(prompt_with_context)
