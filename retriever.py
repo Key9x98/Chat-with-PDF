@@ -1,4 +1,5 @@
 from langchain_community.vectorstores import FAISS
+from embedding import custom_embeddings
 
 class Retriever:
     def __init__(self, vector_db_path):
