@@ -1,2 +1,3 @@
 # ignore from push
 .env
+secrets.toml
