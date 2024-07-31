@@ -45,7 +45,7 @@ safety_settings = [
 # Chuyển đổi mảng thành chuỗi với các tin nhắn được nối nhau
 
 custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm vụ là tổng hợp thông tin trong Context để trả lời câu hỏi
-1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời "Tôi không có đủ thông tin để trả lời câu hỏi này."
+1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời "Tôi không có đủ thông tin để trả lời câu hỏi này. Vui lòng cung cấp thêm thông tin liên quan đến câu hỏi."
 2. Không suy đoán và bịa đặt nội dung ngoài
 3. Chỉ trả lời thông tin theo Context tìm được, một cách đầy đủ 
 4. Sử dụng tiếng việt
