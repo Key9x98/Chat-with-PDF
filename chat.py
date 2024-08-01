@@ -11,6 +11,7 @@ load_dotenv()
 # GOOGLE_API_KEY = os.getenv("API_KEY")
 # MODEL_NAME =  os.getenv("MODEL_NAME")
 
+# if chạy trên streamlit
 GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 MODEL_NAME = st.secrets["MODEL_NAME"]
 
