@@ -1,10 +1,17 @@
 import streamlit as st
-from document_processor import DocumentProcessor
 import tempfile
 import os
 from chat import set_custom_prompt
 from chat import gemini_bot
+from pdf_processor import PDFDatabaseManager
+import shutil
+import time
 
+vector_db_path = "vectorstores/db_faiss"
+hash_store_path = "vectorstores/hashes.json"
+pdf_data_path = ''
+
+manager = PDFDatabaseManager(pdf_data_path, vector_db_path, hash_store_path)
 
 def main():
     # Cấu hình trang
@@ -23,16 +30,30 @@ def main():
         if st.button("Submit & Process"):
             if pdf_docs:
                 with st.spinner("Processing..."):
+                    status_placeholder = st.empty()
                     with tempfile.TemporaryDirectory() as temp_dir:
-                        # Save uploaded files to the temporary directory
+                        manager.pdf_data_path = temp_dir
                         for uploaded_file in pdf_docs:
                             file_path = os.path.join(temp_dir, uploaded_file.name)
                             with open(file_path, "wb") as f:
                                 f.write(uploaded_file.getbuffer())
-                        processor = DocumentProcessor(temp_dir, "vectorstores/db_faiss")
-                        db = processor.run()
-                    st.session_state.vector_db = db
-                    st.success("PDFs processed and vector database created!")
+
+                        pdf_files = [f for f in os.listdir(temp_dir) if f.lower().endswith('.pdf')]
+                        for pdf_file in pdf_files:
+                            file_path = os.path.join(temp_dir, pdf_file)
+                            if not manager.is_pdf_exists(file_path):
+                                status_placeholder.write(f"Tệp {pdf_file} chưa có trong db. Processing...")
+                                manager.update_db(file_path)
+                            else:
+                                status_placeholder.write(f"Tệp {pdf_file} đã có trong db, gửi tệp khác.")
+                    db = manager.load_existing_db()
+                    if db is not None:
+                        st.session_state.vector_db = db
+                        st.success("PDFs processed and vector database created!")
+
+                        time.sleep(3)
+                        status_placeholder.empty()
+
             else:
                 st.warning("No file selected")
 
