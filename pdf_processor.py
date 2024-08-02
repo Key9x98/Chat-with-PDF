@@ -146,15 +146,15 @@ manager = PDFDatabaseManager(pdf_data_path, vector_db_path, hash_store_path)
 #     else:
 #         print(f"Tệp {pdf_file} đã có trong db, gửi tệp khác.")
 
-#
-user_question = ("Bộ dữ liệu")
-db = manager.load_existing_db()
-a = db.similarity_search(user_question, k=3)
+# #
+# user_question = ("Bộ dữ liệu")
+# db = manager.load_existing_db()
+# a = db.similarity_search(user_question, k=3)
 
-context = "\n-----------------------------------\n".join([
-    f"Content:\n{doc.page_content}\nMetadata:\n{doc.metadata}" for doc in a
-])
-print(context)
+# context = "\n-----------------------------------\n".join([
+#     f"Content:\n{doc.page_content}\nMetadata:\n{doc.metadata}" for doc in a
+# ])
+# print(context)
 
 # original_docs = manager.process_document()
 # print(original_docs)
