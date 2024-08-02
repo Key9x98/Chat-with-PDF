@@ -11,6 +11,7 @@ load_dotenv()
 # GOOGLE_API_KEY = os.getenv("API_KEY")
 # MODEL_NAME =  os.getenv("MODEL_NAME")
 
+# if chạy trên streamlit
 GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 MODEL_NAME = st.secrets["MODEL_NAME"]
 
@@ -50,8 +51,8 @@ custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm v�
 3. Chỉ trả lời thông tin theo Context tìm được, một cách đầy đủ 
 4. Sử dụng tiếng việt
 5. Chỉ sử dụng History khi người dùng hỏi về câu hỏi trước đó:
- History: {history_global}
-Context: {context}
+ History: {history_global},
+Context: {context},
 Question: {question}
 
 Câu trả lời:
@@ -93,9 +94,7 @@ class GeminiBot:
     if self.token_count > 1000000:
       return "Out of tokens"
 
-    prompt = "Bạn là một hệ thống hỏi đáp, hãy giúp người dùng trả lời câu hỏi theo cú pháp câu hỏi - câu trả lời"
-
-    response = self.chat.send_message(prompt + user_input)
+    response = self.chat.send_message(user_input)
     self.token_count += input_tokens + self.model.count_tokens(response.text).total_tokens
     
     return response.text
