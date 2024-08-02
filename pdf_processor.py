@@ -42,6 +42,9 @@ class PDFDatabaseManager:
             length_function=len
         )
         chunks = text_splitter.split_documents([document])
+        for i, chunk in enumerate(chunks):
+            chunk.metadata['chunk_index'] = i
+
         return chunks
 
     def load_existing_db(self):
@@ -126,12 +129,12 @@ class PDFDatabaseManager:
         self.save_hashes(existing_hashes)
 
 
-### test
-# pdf_data_path = "PDFs"
-# vector_db_path = "vectorstores/db_faiss"
-# hash_store_path = "vectorstores/hashes.json"
-#
-# manager = PDFDatabaseManager(pdf_data_path, vector_db_path, hash_store_path)
+## test
+pdf_data_path = "PDFs"
+vector_db_path = "vectorstores/db_faiss"
+hash_store_path = "vectorstores/hashes.json"
+
+manager = PDFDatabaseManager(pdf_data_path, vector_db_path, hash_store_path)
 
 # pdf_files = [f for f in os.listdir(pdf_data_path) if f.lower().endswith('.pdf')]
 # for pdf_file in pdf_files:
@@ -142,9 +145,27 @@ class PDFDatabaseManager:
 #         manager.update_db(file_path)
 #     else:
 #         print(f"Tệp {pdf_file} đã có trong db, gửi tệp khác.")
+
 #
+user_question = ("Bộ dữ liệu")
+db = manager.load_existing_db()
+a = db.similarity_search(user_question, k=3)
+
+context = "\n-----------------------------------\n".join([
+    f"Content:\n{doc.page_content}\nMetadata:\n{doc.metadata}" for doc in a
+])
+print(context)
+
+# original_docs = manager.process_document()
+# print(original_docs)
+
+
+# loader = PyPDFLoader('C:\\Users\\CNTT\\PDFChatbot\\Chat-with-PDF\\PDFs\\Hoàng_Vũ_Minh_KLTN_HUS.pdf')
+# documents = loader.load()
 #
-# user_question = ("Điều kiện nghỉ học là gì")
-# db = manager.load_existing_db()
-# a = db.similarity_search(user_question, k=2)
-# print(a)
+# all_text = "\n".join(doc.page_content for doc in documents)
+# print(all_text)
+# with open('text.txt', 'w', encoding='utf-8') as file:
+#     file.write(all_text)
+# Xử lý văn bản
+

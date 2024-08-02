@@ -94,9 +94,7 @@ class GeminiBot:
     if self.token_count > 1000000:
       return "Out of tokens"
 
-    prompt = "Bạn là một hệ thống hỏi đáp, hãy giúp người dùng trả lời câu hỏi theo cú pháp câu hỏi - câu trả lời"
-
-    response = self.chat.send_message(prompt + user_input)
+    response = self.chat.send_message(user_input)
     self.token_count += input_tokens + self.model.count_tokens(response.text).total_tokens
     
     return response.text
