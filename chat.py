@@ -50,8 +50,8 @@ custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm v�
 3. Chỉ trả lời thông tin theo Context tìm được, một cách đầy đủ 
 4. Sử dụng tiếng việt
 5. Chỉ sử dụng History khi người dùng hỏi về câu hỏi trước đó:
- History: {history_global}
-Context: {context}
+ History: {history_global},
+Context: {context},
 Question: {question}
 
 Câu trả lời:
