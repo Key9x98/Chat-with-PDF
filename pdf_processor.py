@@ -36,9 +36,9 @@ class PDFDatabaseManager:
     def process_document(self, document):
         """Xử lý tài liệu để chia thành các đoạn văn bản."""
         text_splitter = RecursiveCharacterTextSplitter(
-            separators="\n",
-            chunk_size=1024,
-            chunk_overlap=64,
+            separators=["\n\n", "\n", " ", ".", "!", "?", ""],
+            chunk_size=512,
+            chunk_overlap=256,
             length_function=len
         )
         chunks = text_splitter.split_documents([document])
