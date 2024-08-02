@@ -63,7 +63,7 @@ def set_custom_prompt():
   Prompt template for QA retrieval for each vectorstore
   """
   prompt = PromptTemplate(template=custom_prompt_template,
-                          input_variables=['context', 'question'])
+                          input_variables=['history_global','context', 'question'])
   return prompt
 
 class GeminiBot:
