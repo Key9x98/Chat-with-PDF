@@ -195,7 +195,6 @@ class ContextRetriever:
 # pdf_data_path = "PDFs"
 # vector_db_path = "vectorstores/db_faiss"
 # hash_store_path = "vectorstores/hashes.json"
-#
 # manager = PDFDatabaseManager(pdf_data_path, vector_db_path, hash_store_path)
 
 # import time
@@ -217,29 +216,18 @@ class ContextRetriever:
 # user_question = ("Sinh viên cần đạt những điều kiện gì để được xét học bổng  khuyến khích tập")
 # db = manager.load_existing_db()
 # a = db.similarity_search(user_question, k=2)
-#
+
 # context = [doc.page_content for doc in a]
 # metadata = [doc.metadata for doc in a]
-#
 # retriever = ContextRetriever()
-#
-# expanded_contexts = []
-#
 # for i in range(len(context)):
 #     # Lấy tên file tương ứng với metadata
 #     file_name = retriever.get_file_name(metadata[i])
 #     print(f"Tên file là: {file_name}")
-#
 #     expanded_context = retriever.expand_context(file_name, context[i])
 #     expanded_contexts.append(expanded_context)
-#
 # final_context = "\n--------------------------\n".join(expanded_contexts)
-#
-# # Ghi final_context vào một file văn bản
-# with open('text.txt', 'w', encoding='utf-8') as file:
-#     file.write(final_context)
-#
-#
+
 # print("Combined Expanded Context:\n", final_context)
 
 
