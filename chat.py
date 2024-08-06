@@ -8,12 +8,12 @@ from dotenv import load_dotenv
 # Load .env file
 load_dotenv()
 
-# GOOGLE_API_KEY = os.getenv("API_KEY")
-# MODEL_NAME =  os.getenv("MODEL_NAME")
+GOOGLE_API_KEY = os.getenv("API_KEY")
+MODEL_NAME =  os.getenv("MODEL_NAME")
 
-# if chạy trên streamlit
-GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
-MODEL_NAME = st.secrets["MODEL_NAME"]
+# # if chạy trên streamlit
+# GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
+# MODEL_NAME = st.secrets["MODEL_NAME"]
 
 
 print(MODEL_NAME)
@@ -101,8 +101,6 @@ class GeminiBot:
 
 
 gemini_bot = GeminiBot()
-
-# Sử dụng đối tượng để trả lời câu hỏi
-user_question = "1 + 1 bằng mấy"
-bot_response = gemini_bot.response(user_question)
-print(bot_response)
+# user_question = "1 + 1 bằng mấy"
+# bot_response = gemini_bot.response(user_question)
+# print(bot_response)
