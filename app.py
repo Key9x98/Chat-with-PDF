@@ -16,6 +16,9 @@ retriever = ContextRetriever("original_text")
 
 
 def main():
+    # Cấu hình trang
+    st.set_page_config(page_title="ChatPDF", page_icon='🤖')
+    st.header("Vietnamese PDF Chat")
     st.markdown(
         """
         <style>
@@ -28,11 +31,7 @@ def main():
         """,
         unsafe_allow_html=True
     )
-    # Cấu hình trang
-    st.set_page_config(page_title="ChatPDF", page_icon='🤖')
-    st.header("Vietnamese PDF Chat")
-
-
+    
     user_question = st.chat_input("Ask a Question from the PDF Files")
 
     if "history_global" not in st.session_state:
