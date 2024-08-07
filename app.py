@@ -5,7 +5,6 @@ from chat import set_custom_prompt
 from chat import gemini_bot
 from pdf_processor import PDFDatabaseManager
 import time
-import handle_chat
 from pdf_processor import ContextRetriever
 
 vector_db_path = "vectorstores/db_faiss"
@@ -21,7 +20,7 @@ def main():
     st.set_page_config(page_title="ChatPDF", page_icon='🤖')
     st.header("Vietnamese PDF Chat")
 
-    # Giao diện người dùng cho việc nhập câu hỏi
+
     user_question = st.chat_input("Ask a Question from the PDF Files")
 
     if "history_global" not in st.session_state:
@@ -59,6 +58,8 @@ def main():
 
             else:
                 st.warning("No file selected")
+        st.markdown(
+            "Nếu muốn tìm thông tin trong PDF, hãy sử dụng những từ khóa như PDF, tài liệu, file, tài liệu, bài báo ")
 
     # Khởi tạo lịch sử chat
     if "messages" not in st.session_state:
