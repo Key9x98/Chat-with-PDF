@@ -75,13 +75,14 @@ def main():
             with st.chat_message("user"):
                 st.markdown(user_question)
 
-            if handle_chat.is_chitchat_question(user_question, handle_chat.chitchatSample):
-                response = handle_chat.handle_chitchat(user_question)
-                with st.chat_message('assistant'):
-                    st.markdown(response)
+            # if handle_chat.is_chitchat_question(user_question, handle_chat.chitchatSample):
+            #     response = handle_chat.handle_chitchat(user_question)
+            #     with st.chat_message('assistant'):
+            #         st.markdown(response)
 
-            # Xử lý câu hỏi mới
-            else:
+            pdf_related_keywords = ["tài liệu", "pdf", "file", "tệp", "bài báo"]
+
+            if any(keyword in user_question.lower() for keyword in pdf_related_keywords):
                 docs = st.session_state.vector_db.similarity_search(user_question, k=2)
                 contexts = [doc.page_content for doc in docs]
                 metadatas = [doc.metadata for doc in docs]
@@ -109,7 +110,10 @@ def main():
                     st.markdown(response)
                     with st.expander("Show Context", expanded=False):
                         st.write(context)
-
+            else:
+                response = gemini_bot.response(user_question).strip()
+                with st.chat_message('assistant'):
+                    st.markdown(response)
             # Thêm tin nhắn của người dùng và phản hồi của trợ lý vào lịch sử chat
             st.session_state.messages.append({"role": "user", "content": user_question})
             st.session_state.messages.append({"role": "assistant", "content": response})
