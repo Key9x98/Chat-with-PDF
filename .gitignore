@@ -1,6 +1,3 @@
 # ignore from push
 .env
-secrets.toml
-PDFs
-vectorstores
-original_text
+PDFs/
