@@ -105,7 +105,8 @@ def main():
                         time.sleep(0.04)
                         message_placeholder.write(full_response + "▌", unsafe_allow_html=True)
                     time.sleep(0.1)
-                    message_placeholder.markdown(response + "\n", unsafe_allow_html=True)
+                    final_message = "**_Câu trả lời trích từ tài liệu:_**\n\n" + response
+                    message_placeholder.markdown(final_message, unsafe_allow_html=True)
                     with st.expander("Show Context", expanded=False):
                         st.write(context)
             else:
