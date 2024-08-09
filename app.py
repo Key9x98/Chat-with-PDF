@@ -16,6 +16,9 @@ retriever = ContextRetriever("original_text")
 
 
 def main():
+    # Cấu hình trang
+    st.set_page_config(page_title="ChatPDF", page_icon='🤖')
+    st.header("Vietnamese PDF Chat")
     st.markdown(
         """
         <style>
@@ -28,9 +31,6 @@ def main():
         """,
         unsafe_allow_html=True
     )
-    # Cấu hình trang
-    st.set_page_config(page_title="ChatPDF", page_icon='🤖')
-    st.header("Vietnamese PDF Chat")
 
 
     user_question = st.chat_input("Ask a Question from the PDF Files")
@@ -88,11 +88,6 @@ def main():
             with st.chat_message("user"):
                 st.markdown(user_question)
 
-            # if handle_chat.is_chitchat_question(user_question, handle_chat.chitchatSample):
-            #     response = handle_chat.handle_chitchat(user_question)
-            #     with st.chat_message('assistant'):
-            #         st.markdown(response)
-
             pdf_related_keywords = ["tài liệu", "pdf", "file", "tệp", "bài báo"]
 
             if any(keyword in user_question.lower() for keyword in pdf_related_keywords):
@@ -120,13 +115,30 @@ def main():
                 st.session_state.last_answer = response
 
                 with st.chat_message('assistant'):
-                    st.markdown(response)
+                    message_placeholder = st.empty()
+                    full_response = ""
+                    for chunk in response.split():
+                        full_response += chunk + " "
+                        time.sleep(0.05)
+                        message_placeholder.markdown(full_response + "▌")
+                    message_placeholder.markdown(full_response)
                     with st.expander("Show Context", expanded=False):
                         st.write(context)
+
+                    # st.markdown(response)
+                    # with st.expander("Show Context", expanded=False):
+                    #     st.write(context)
             else:
                 response = gemini_bot.response(user_question).strip()
                 with st.chat_message('assistant'):
-                    st.markdown(response)
+                    message_placeholder = st.empty()
+                    full_response = ""
+                    for chunk in response.split():
+                        full_response += chunk + " "
+                        time.sleep(0.05)
+                        message_placeholder.markdown(full_response + "▌")
+                    message_placeholder.markdown(full_response)
+
             # Thêm tin nhắn của người dùng và phản hồi của trợ lý vào lịch sử chat
             st.session_state.messages.append({"role": "user", "content": user_question})
             st.session_state.messages.append({"role": "assistant", "content": response})

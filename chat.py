@@ -6,12 +6,11 @@ from langchain_core.prompts import PromptTemplate
 from dotenv import load_dotenv
 
 # Load .env file
-load_dotenv()
-
+# load_dotenv()
 # GOOGLE_API_KEY = os.getenv("API_KEY")
 # MODEL_NAME =  os.getenv("MODEL_NAME")
 
-# # if chạy trên streamlit
+# chạy trên streamlit: thêm 2 trường ở config
 GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 MODEL_NAME = st.secrets["MODEL_NAME"]
 
@@ -28,22 +27,22 @@ generation_config = {
 safety_settings = [
   {
     "category": "HARM_CATEGORY_HARASSMENT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    "threshold": "BLOCK_ONLY_HIGH"
   },
   {
     "category": "HARM_CATEGORY_HATE_SPEECH",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    "threshold": "BLOCK_ONLY_HIGH"
   },
   {
     "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    "threshold": "BLOCK_ONLY_HIGH"
   },
   {
     "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    "threshold": "BLOCK_ONLY_HIGH"
   },
 ]
-# Chuyển đổi mảng thành chuỗi với các tin nhắn được nối nhau
+
 
 custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm vụ là tổng hợp thông tin trong Context để trả lời câu hỏi
 1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời "Tôi không có đủ thông tin để trả lời câu hỏi này. Vui lòng cung cấp thêm thông tin liên quan đến câu hỏi."
