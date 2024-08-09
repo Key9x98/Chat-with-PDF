@@ -1,4 +1,14 @@
 # Chat-with-PDF
+### Giới thiệu dự án:
+Dự án của chúng tôi - PDF Chatter là một công cụ cho phép tải lên các file PDF và đặt câu hỏi về nội dung bên trong. Công cụ sẽ phân tích và trích xuất thông tin từ tài liệu, giúp bạn nhanh chóng tìm kiếm và nắm bắt các thông tin cần thiết mà không cần đọc toàn bộ file PDF. Ngoài ra chúng tôi cũng hỗ trợ chế độ chat với thông tin bên ngoài, giúp các bạn có thể dễ dàng so sánh và đối chiếu với thông tin trong PDF.
+
+### Chạy dự án:
+Nếu bạn là coder hoặc nhà phát triển:
+```bash
+git clone https://github.com/Key9x98/Chat-with-PDF.git
+cd Chat-with-PDF
+pip install -r requirements.txt
+streamlit run app.py
 
 
 
