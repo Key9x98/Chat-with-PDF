@@ -45,7 +45,6 @@ def main():
         mode = st.radio("Choose mode: ", ("Chat", "PDF Query"))
         st.session_state.chat_bot.set_mode(mode.lower().replace(" ", "_"))
 
-
         st.title("Upload PDF")
         pdf_docs = st.file_uploader("You can upload multiple PDFs", type="pdf", accept_multiple_files=True)
         if st.button("Submit & Process"):
@@ -103,9 +102,10 @@ def main():
                     full_response = ""
                     for chunk in response.split():
                         full_response += chunk + " "
-                        time.sleep(0.05)
-                        message_placeholder.markdown(full_response + "▌")
-                    message_placeholder.markdown(full_response)
+                        time.sleep(0.04)
+                        message_placeholder.write(full_response + "▌", unsafe_allow_html=True)
+                    time.sleep(0.1)
+                    message_placeholder.markdown(response + "\n", unsafe_allow_html=True)
                     with st.expander("Show Context", expanded=False):
                         st.write(context)
             else:
@@ -117,9 +117,10 @@ def main():
                 full_response = ""
                 for chunk in response.split():
                     full_response += chunk + " "
-                    time.sleep(0.05)
-                    message_placeholder.markdown(full_response + "▌")
-                message_placeholder.markdown(full_response)
+                    time.sleep(0.04)
+                    message_placeholder.write(full_response + "▌", unsafe_allow_html=True)
+                time.sleep(0.1)
+                message_placeholder.markdown(response + "\n", unsafe_allow_html=True)
 
         # Thêm tin nhắn của người dùng và phản hồi của trợ lý vào lịch sử chat
         st.session_state.messages.append({"role": "user", "content": user_question})
