@@ -6,7 +6,7 @@ from chat import gemini_bot
 from pdf_processor import PDFDatabaseManager
 import time
 from pdf_processor import ContextRetriever
-
+from botMode import chatBotMode
 vector_db_path = "vectorstores/db_faiss"
 hash_store_path = "vectorstores/hashes.json"
 pdf_data_path = ''
@@ -36,7 +36,16 @@ def main():
     if "history_global" not in st.session_state:
         st.session_state.history_global = []
 
+    if "chat_bot" not in st.session_state:
+        st.session_state.chat_bot = chatBotMode()
     with st.sidebar:
+        st.title("Settings")
+
+        #Thêm chế độ bot
+        mode = st.radio("Choose mode: ", ("Chat", "PDF Query"))
+        st.session_state.chat_bot.set_mode(mode.lower().replace(" ", "_"))
+
+
         st.title("Upload PDF")
         pdf_docs = st.file_uploader("You can upload multiple PDFs", type="pdf", accept_multiple_files=True)
         if st.button("Submit & Process"):
@@ -68,8 +77,7 @@ def main():
 
             else:
                 st.warning("No file selected")
-        st.markdown(
-            "Nếu muốn tìm thông tin trong PDF, hãy sử dụng những từ khóa như PDF, tài liệu, file, tài liệu, bài báo ")
+        
 
     # Khởi tạo lịch sử chat
     if "messages" not in st.session_state:
@@ -81,37 +89,15 @@ def main():
             st.markdown(message["content"])
 
     if user_question:
+        with st.chat_message("user"):
+            st.markdown(user_question)
 
-        if 'vector_db' in st.session_state:
-            with st.chat_message("user"):
-                st.markdown(user_question)
+        response = None  # Khởi tạo response với giá trị mặc định
+        context = None
+        if st.session_state.chat_bot.mode == "pdf_query":
 
-            pdf_related_keywords = ["tài liệu", "pdf", "file", "tệp", "bài báo"]
-
-            if any(keyword in user_question.lower() for keyword in pdf_related_keywords):
-                docs = st.session_state.vector_db.similarity_search(user_question, k=2)
-                contexts = [doc.page_content for doc in docs]
-                metadatas = [doc.metadata for doc in docs]
-                expanded_contexts = []
-                for i in range(len(contexts)):
-                    file_name = retriever.get_file_name(metadatas[i])
-                    print(f"Tên file là: {file_name}")
-
-                    expanded_context = retriever.expand_context(file_name, contexts[i])
-                    expanded_contexts.append(expanded_context)
-
-                context = "\n".join(expanded_contexts)
-
-                prompt = set_custom_prompt()
-                st.session_state.history_global.append(user_question + context)
-                history_global_str = "\n".join(st.session_state.history_global)
-                prompt_with_context = prompt.format(history_global=history_global_str, context=context,
-                                                    question=user_question)
-                response = gemini_bot.response(prompt_with_context)
-
-                # Lưu trữ câu trả lời cuối cùng
-                st.session_state.last_answer = response
-
+            if 'vector_db' in st.session_state:
+                response, context = st.session_state.chat_bot.process_question(user_question)
                 with st.chat_message('assistant'):
                     message_placeholder = st.empty()
                     full_response = ""
@@ -122,32 +108,23 @@ def main():
                     message_placeholder.markdown(full_response)
                     with st.expander("Show Context", expanded=False):
                         st.write(context)
-
             else:
-                response = gemini_bot.response(user_question).strip()
-                with st.chat_message('assistant'):
-                    message_placeholder = st.empty()
-                    full_response = ""
-                    for chunk in response.split():
-                        full_response += chunk + " "
-                        time.sleep(0.05)
-                        message_placeholder.markdown(full_response + "▌")
-                    message_placeholder.markdown(full_response)
-
-            # Thêm tin nhắn của người dùng và phản hồi của trợ lý vào lịch sử chat
-            st.session_state.messages.append({"role": "user", "content": user_question})
-            st.session_state.messages.append({"role": "assistant", "content": response})
+                st.warning("Hãy đưa file của bạn lên trước, chúng tôi sẽ dựa vào đó để trả lời")
         else:
-            st.warning("Hãy đưa file của bạn lên trước, chúng tôi sẽ dựa vào đó để trả lời")
+            response = st.session_state.chat_bot.process_question(user_question)
+            with st.chat_message('assistant'):
+                message_placeholder = st.empty()
+                full_response = ""
+                for chunk in response.split():
+                    full_response += chunk + " "
+                    time.sleep(0.05)
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
 
-
-def get_last_message(role):
-    messages = st.session_state.get("messages", [])
-    for message in reversed(messages):
-        if message["role"] == role:
-            return message["content"]
-    return None
-
+        # Thêm tin nhắn của người dùng và phản hồi của trợ lý vào lịch sử chat
+        st.session_state.messages.append({"role": "user", "content": user_question})
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        
 
 if __name__ == "__main__":
     main()
