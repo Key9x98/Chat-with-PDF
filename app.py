@@ -31,8 +31,6 @@ def main():
         """,
         unsafe_allow_html=True
     )
-
-
     user_question = st.chat_input("Ask a Question from the PDF Files")
 
     if "history_global" not in st.session_state:
@@ -125,9 +123,6 @@ def main():
                     with st.expander("Show Context", expanded=False):
                         st.write(context)
 
-                    # st.markdown(response)
-                    # with st.expander("Show Context", expanded=False):
-                    #     st.write(context)
             else:
                 response = gemini_bot.response(user_question).strip()
                 with st.chat_message('assistant'):
