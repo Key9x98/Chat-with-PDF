@@ -11,7 +11,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Nếu là người sử dụng hoặc chỉ đơn giản là thử nghiệm, hãy thử nghiệm demo của chúng tôi [tại đây](https://chat-with-pdf-123.streamlit.app/)
+Nếu là người sử dụng hoặc chỉ đơn giản là thử nghiệm hiệu quả, hãy thử demo của chúng tôi [tại đây](https://chat-with-pdf-123.streamlit.app/)
 
 
 
