@@ -7,6 +7,10 @@ from pdf_processor import PDFDatabaseManager
 import time
 from pdf_processor import ContextRetriever
 from botMode import chatBotMode
+from text_processor import TextProcessor
+
+text_processor = TextProcessor()
+
 vector_db_path = "vectorstores/db_faiss"
 hash_store_path = "vectorstores/hashes.json"
 pdf_data_path = ''
@@ -97,12 +101,13 @@ def main():
 
             if 'vector_db' in st.session_state:
                 response, context = st.session_state.chat_bot.process_question(user_question)
+                display_response = text_processor.remove_markdown(response)
                 with st.chat_message('assistant'):
                     message_placeholder = st.empty()
                     full_response = ""
-                    for chunk in response.split():
+                    for chunk in display_response.split():
                         full_response += chunk + " "
-                        time.sleep(0.04)
+                        time.sleep(0.05)
                         message_placeholder.write(full_response + "▌", unsafe_allow_html=True)
                     time.sleep(0.1)
                     final_message = "**_Câu trả lời trích từ tài liệu:_**\n\n" + response
@@ -113,12 +118,13 @@ def main():
                 st.warning("Hãy đưa file của bạn lên trước, chúng tôi sẽ dựa vào đó để trả lời")
         else:
             response = st.session_state.chat_bot.process_question(user_question)
+            display_response = text_processor.remove_markdown(response)
             with st.chat_message('assistant'):
                 message_placeholder = st.empty()
                 full_response = ""
-                for chunk in response.split():
+                for chunk in display_response.split():
                     full_response += chunk + " "
-                    time.sleep(0.04)
+                    time.sleep(0.05)
                     message_placeholder.write(full_response + "▌", unsafe_allow_html=True)
                 time.sleep(0.1)
                 message_placeholder.markdown(response + "\n", unsafe_allow_html=True)
