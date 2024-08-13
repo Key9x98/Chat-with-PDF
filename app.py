@@ -135,6 +135,7 @@ def main():
         last_message = st.session_state.messages[-1]
         end_punctuation = {'.', '!', '?'}
 
+
         if last_message["role"] == "assistant" and not any(
                 last_message["content"].strip().endswith(punct) for punct in end_punctuation):
 
@@ -145,6 +146,7 @@ def main():
                 continue_prompt = f"""
                                         Câu trả lời trước: {last_message['content']}
                                         Câu hỏi: {user_question}
+                                        Context: {context}
                                         Hãy tiếp tục trả lời từ phần hiện tại, không trả lời lặp lại phần trước,
                                         Nếu có yêu cầu về số từ, số từ = số từ trong câu trả lời trước + số từ trong câu trả lời mới:
                                     """
