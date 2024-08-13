@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 class TextProcessor:
     def remove_markdown(self, text):
@@ -7,6 +8,8 @@ class TextProcessor:
         :return: text without markdown elements
         mục đích: tránh lỗi hiển thị khi viết từng phần tử của đoạn văn
         '''
+        if not isinstance(text, str):
+            return ''
         # bold và italic
         text = re.sub(r'\*{1,2}(.*?)\*{1,2}', r'\1', text)
         # strikethrough
@@ -32,6 +35,10 @@ class TextProcessor:
         '''
         return query
 
+    def remove_accents(self, input_str):
+        nfkd_form = unicodedata.normalize('NFKD', input_str)
+        return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
+
     def format_context(self,context):
         '''
         :param contetx:
@@ -39,4 +46,3 @@ class TextProcessor:
         mục đích: hiển thị ra gọn hơn, dễ đọc hơn
         '''
         return context
-
