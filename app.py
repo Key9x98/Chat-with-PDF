@@ -80,13 +80,11 @@ def main():
 
             else:
                 st.warning("No file selected")
-        
 
-    # Khởi tạo lịch sử chat
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Hiển thị tin nhắn chat từ lịch sử trên lần chạy lại ứng dụng
+        # Hiển thị tin nhắn chat từ lịch sử trên lần chạy lại ứng dụng
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
@@ -132,7 +130,38 @@ def main():
         # Thêm tin nhắn của người dùng và phản hồi của trợ lý vào lịch sử chat
         st.session_state.messages.append({"role": "user", "content": user_question})
         st.session_state.messages.append({"role": "assistant", "content": response})
-        
+
+    if st.session_state.messages:
+        last_message = st.session_state.messages[-1]
+        end_punctuation = {'.', '!', '?'}
+
+        if last_message["role"] == "assistant" and not any(
+                last_message["content"].strip().endswith(punct) for punct in end_punctuation):
+
+            # Tạo nút "Generate more" bên ngoài chat_message
+            generate_more = st.button("Generate more", key=f"generate_more_{len(st.session_state.messages)}")
+
+            if generate_more:
+                continue_prompt = f"""
+                                        Câu trả lời trước: {last_message['content']}
+                                        Câu hỏi: {user_question}
+                                        Hãy tiếp tục trả lời từ phần hiện tại, không trả lời lặp lại phần trước,
+                                        Nếu có yêu cầu về số từ, số từ = số từ trong câu trả lời trước + số từ trong câu trả lời mới:
+                                    """
+                continuation = st.session_state.chat_bot.process_question(continue_prompt)
+                display_continuation = text_processor.remove_markdown(continuation)
+
+                with st.container():
+                    message_placeholder = st.empty()
+                    full_continuation = ""
+                    for chunk in display_continuation.split():
+                        full_continuation += chunk + " "
+                        time.sleep(0.05)
+                        message_placeholder.write(full_continuation + "▌", unsafe_allow_html=True)
+                    time.sleep(0.1)
+                    message_placeholder.markdown(continuation + "\n", unsafe_allow_html=True)
+
+                st.session_state.messages.append({"role": "assistant", "content": continuation})
 
 if __name__ == "__main__":
     main()
