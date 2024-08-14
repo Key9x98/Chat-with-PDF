@@ -1,26 +1,23 @@
 import streamlit as st
 import tempfile
 import os
-from chat import set_custom_prompt
-from chat import gemini_bot
 from pdf_processor import PDFDatabaseManager
 import time
 from pdf_processor import ContextRetriever
 from botMode import chatBotMode
 from text_processor import TextProcessor
-
-text_processor = TextProcessor()
+from chat import gemini_bot
 
 vector_db_path = "vectorstores/db_faiss"
 hash_store_path = "vectorstores/hashes.json"
 pdf_data_path = ''
 
+text_processor = TextProcessor()
 manager = PDFDatabaseManager(pdf_data_path, vector_db_path, hash_store_path)
 retriever = ContextRetriever("original_text")
 
 
 def main():
-    # Cấu hình trang
     st.set_page_config(page_title="ChatPDF", page_icon='🤖')
     st.header("Vietnamese PDF Chat")
     st.markdown(
@@ -39,13 +36,20 @@ def main():
 
     if "history_global" not in st.session_state:
         st.session_state.history_global = []
-
     if "chat_bot" not in st.session_state:
         st.session_state.chat_bot = chatBotMode()
+    if "processed_pdfs" not in st.session_state:
+        st.session_state.processed_pdfs = []
+    if "selected_pdfs" not in st.session_state:
+        st.session_state.selected_pdfs = set()
+    if "vector_db" not in st.session_state:
+        st.session_state.vector_db = {}
+
+    st.session_state.chat_bot.vector_db = st.session_state.vector_db
+
     with st.sidebar:
         st.title("Settings")
 
-        #Thêm chế độ bot
         mode = st.radio("Choose mode: ", ("Chat", "PDF Query"))
         st.session_state.chat_bot.set_mode(mode.lower().replace(" ", "_"))
 
@@ -66,25 +70,46 @@ def main():
                         for pdf_file in pdf_files:
                             file_path = os.path.join(temp_dir, pdf_file)
                             if not manager.is_pdf_exists(file_path):
-                                status_placeholder.write(f"Tệp {pdf_file} chưa có trong db. Processing...")
-                                manager.update_db(file_path)
+                                status_placeholder.write(f"Processing {pdf_file}...")
+                                db = manager.update_db(file_path)
+                                if db is not None:
+                                    st.session_state.vector_db[pdf_file] = db
+                                st.session_state.processed_pdfs.append(pdf_file)
+                                st.session_state.selected_pdfs.add(pdf_file)
                             else:
-                                status_placeholder.write(f"Tệp {pdf_file} đã có trong db, gửi tệp khác.")
-                    db = manager.load_existing_db()
-                    if db is not None:
-                        st.session_state.vector_db = db
-                        st.success("PDFs processed and vector database created!")
+                                status_placeholder.write(f"{pdf_file} already exists in the database.")
 
-                        time.sleep(3)
-                        status_placeholder.empty()
+                    for pdf_file in st.session_state.processed_pdfs:
+                        db = manager.load_existing_db(pdf_file)
+                        if db is not None:
+                            st.session_state.vector_db[pdf_file] = db
 
+                    st.success("PDFs processed and vector database created!")
+                    time.sleep(2)
+                    status_placeholder.empty()
             else:
                 st.warning("No file selected")
+
+        st.title("Manage PDFs")
+        if st.session_state.chat_bot.mode == "pdf_query":
+            if not st.session_state.vector_db:
+                st.info("No PDFs uploaded yet. Please upload PDFs to query.")
+            else:
+                pdfs_status_changed = False
+                for pdf in st.session_state.vector_db:
+                    selected = st.checkbox(f"Query {pdf}", value=pdf in st.session_state.selected_pdfs)
+                    if selected != (pdf in st.session_state.selected_pdfs):
+                        pdfs_status_changed = True
+                    if selected:
+                        st.session_state.selected_pdfs.add(pdf)
+                    else:
+                        st.session_state.selected_pdfs.discard(pdf)
+                if pdfs_status_changed:
+                    st.success("PDF selection updated.")
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-        # Hiển thị tin nhắn chat từ lịch sử trên lần chạy lại ứng dụng
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
@@ -93,28 +118,41 @@ def main():
         with st.chat_message("user"):
             st.markdown(user_question)
 
-        response = None  # Khởi tạo response với giá trị mặc định
+        response = None
         context = None
         if st.session_state.chat_bot.mode == "pdf_query":
+            if st.session_state.vector_db:
+                selected_dbs = {pdf: st.session_state.vector_db[pdf] for pdf in st.session_state.selected_pdfs if
+                                pdf in st.session_state.vector_db}
+                if selected_dbs:
+                    temp_vector_db = st.session_state.chat_bot.vector_db
+                    st.session_state.chat_bot.vector_db = selected_dbs
+                    # print(st.session_state.chat_bot.vector_db)
+                    response, context = st.session_state.chat_bot.process_question(user_question)
 
-            if 'vector_db' in st.session_state:
-                response, context = st.session_state.chat_bot.process_question(user_question)
-                display_response = text_processor.remove_markdown(response)
-                with st.chat_message('assistant'):
-                    message_placeholder = st.empty()
-                    full_response = ""
-                    for chunk in display_response.split():
-                        full_response += chunk + " "
-                        time.sleep(0.05)
-                        message_placeholder.write(full_response + "▌", unsafe_allow_html=True)
-                    time.sleep(0.1)
-                    final_message = "**_Câu trả lời trích từ tài liệu:_**\n\n" + response
-                    message_placeholder.markdown(final_message, unsafe_allow_html=True)
-                    with st.expander("Show Context", expanded=False):
-                        st.write(context)
+                    st.session_state.chat_bot.vector_db = temp_vector_db
+
+                    display_response = text_processor.remove_markdown(response)
+                    with st.chat_message('assistant'):
+                        message_placeholder = st.empty()
+                        full_response = ""
+                        for chunk in display_response.split():
+                            full_response += chunk + " "
+                            time.sleep(0.04)
+                            message_placeholder.write(full_response + "▌")
+                        time.sleep(0.1)
+                        final_message = "**Answer extracted from the document:**\n\n" + response
+                        message_placeholder.markdown(final_message)
+                        with st.expander("Show Context", expanded=False):
+                            st.write(context)
+
+                        st.session_state.current_context = context
+                else:
+                    st.warning("Please select at least one PDF to query.")
             else:
-                st.warning("Hãy đưa file của bạn lên trước, chúng tôi sẽ dựa vào đó để trả lời")
+                st.warning("Please upload your files first, we will use them to answer.")
         else:
+            st.session_state.current_context = ""
             response = st.session_state.chat_bot.process_question(user_question)
             display_response = text_processor.remove_markdown(response)
             with st.chat_message('assistant'):
@@ -122,12 +160,11 @@ def main():
                 full_response = ""
                 for chunk in display_response.split():
                     full_response += chunk + " "
-                    time.sleep(0.05)
-                    message_placeholder.write(full_response + "▌", unsafe_allow_html=True)
+                    time.sleep(0.04)
+                    message_placeholder.write(full_response + "▌")
                 time.sleep(0.1)
-                message_placeholder.markdown(response + "\n", unsafe_allow_html=True)
+                message_placeholder.markdown(response + "\n")
 
-        # Thêm tin nhắn của người dùng và phản hồi của trợ lý vào lịch sử chat
         st.session_state.messages.append({"role": "user", "content": user_question})
         st.session_state.messages.append({"role": "assistant", "content": response})
 
@@ -142,13 +179,18 @@ def main():
             generate_more = st.button("Generate more", key=f"generate_more_{len(st.session_state.messages)}")
 
             if generate_more:
+                context = st.session_state.current_context
                 continue_prompt = f"""
-                                        Câu trả lời trước: {last_message['content']}
-                                        Câu hỏi: {user_question}
-                                        Hãy tiếp tục trả lời từ phần hiện tại, không trả lời lặp lại phần trước,
-                                        Nếu có yêu cầu về số từ, số từ = số từ trong câu trả lời trước + số từ trong câu trả lời mới:
-                                    """
-                continuation = st.session_state.chat_bot.process_question(continue_prompt)
+                                            Câu trả lời trước: {last_message['content']},
+                                            Câu hỏi: {user_question},
+                                            Context: {context},
+                                            Hãy tiếp tục trả lời từ phần hiện tại sang phải, không trả lời lặp lại phần trước.
+                                            Context có thể có hoặc không.
+                                            Nếu context xuất hiện, chỉ trả lời theo context, không thêm nội dung ngoài.
+                                            Nếu không có yêu cầu về số từ, hãy dừng lại khi câu trả lời đầy đủ.
+                                            Nếu có yêu cầu về số từ, số từ = số từ trong câu trả lời trước + số từ trong câu trả lời mới:
+                                        """
+                continuation = gemini_bot.response(continue_prompt)
                 display_continuation = text_processor.remove_markdown(continuation)
 
                 with st.container():
