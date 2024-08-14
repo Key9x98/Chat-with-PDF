@@ -133,7 +133,7 @@ def main():
 
     if st.session_state.messages:
         last_message = st.session_state.messages[-1]
-        end_punctuation = {'.', '!', '?'}
+        end_punctuation = text_processor.get_end_tokens()
 
         if last_message["role"] == "assistant" and not any(
                 last_message["content"].strip().endswith(punct) for punct in end_punctuation):

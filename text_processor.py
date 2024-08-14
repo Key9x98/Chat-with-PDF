@@ -24,6 +24,16 @@ class TextProcessor:
         text = re.sub(r'^\s*\d+\.\s', '', text, flags=re.MULTILINE)
         return text.strip()
 
+    def get_end_tokens(self):
+        try:
+            with open('end_tokens.txt', 'r', encoding='utf-8') as file:
+                end_tokens = set(token.strip() for token in file if token.strip())
+            return end_tokens
+        except FileNotFoundError:
+            print(
+                f"Không tìm thấy file.")
+            return set()
+
     def remove_stopwords(self, query):
         '''
         :param query:
@@ -40,3 +50,6 @@ class TextProcessor:
         '''
         return context
 
+test = TextProcessor()
+ends = test.get_end_tokens()
+print(ends)
