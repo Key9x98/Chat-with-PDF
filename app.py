@@ -19,7 +19,15 @@ retriever = ContextRetriever("original_text")
 
 def main():
     st.set_page_config(page_title="ChatPDF", page_icon='🤖')
-    st.header("Vietnamese PDF Chat")
+    col1, col2 = st.columns([0.6, 0.4])  # Tạo hai cột với tỉ lệ 9:1
+
+    with col1:
+        st.header("Vietnamese PDF Chat")
+
+    with col2:
+        if st.button("🧹", help="Clean data and reload"):
+            clean_data()
+
     st.markdown(
         """
         <style>
@@ -32,7 +40,10 @@ def main():
         """,
         unsafe_allow_html=True
     )
+
     user_question = st.chat_input("Ask a Question from the PDF Files")
+
+
 
     if "history_global" not in st.session_state:
         st.session_state.history_global = []
@@ -144,7 +155,8 @@ def main():
                         final_message = "**Answer extracted from the document:**\n\n" + response
                         message_placeholder.markdown(final_message)
                         with st.expander("Show Context", expanded=False):
-                            st.write(context)
+                            formatted_context = text_processor.format_context(context)
+                            st.markdown(formatted_context, unsafe_allow_html=True)
 
                         st.session_state.current_context = context
                 else:
@@ -172,8 +184,9 @@ def main():
         last_message = st.session_state.messages[-1]
         end_punctuation = text_processor.get_end_tokens()
 
-        if last_message["role"] == "assistant" and not any(
-                last_message["content"].strip().endswith(punct) for punct in end_punctuation):
+        if (last_message["role"] == "assistant" and
+                last_message.get("content") and
+                not any(last_message["content"].strip().endswith(punct) for punct in end_punctuation)):
 
             # Tạo nút "Generate more" bên ngoài chat_message
             generate_more = st.button("Generate more", key=f"generate_more_{len(st.session_state.messages)}")
@@ -204,6 +217,29 @@ def main():
                     message_placeholder.markdown(continuation + "\n", unsafe_allow_html=True)
 
                 st.session_state.messages.append({"role": "assistant", "content": continuation})
+
+import shutil
+def clean_data():
+    try:
+        # Xóa thư mục vectorstores
+        if os.path.exists("vectorstores"):
+            shutil.rmtree("vectorstores")
+
+        # Xóa thư mục original_text
+        if os.path.exists("original_text"):
+            shutil.rmtree("original_text")
+
+        # Xóa các biến session state
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+
+        st.warning("Dữ liệu đã được xóa. Trang sẽ tải lại sau 3 giây...")
+        time.sleep(3)
+
+        st.rerun()
+    except Exception as e:
+        st.error(f"Có lỗi xảy ra khi dọn dẹp dữ liệu: {str(e)}")
+
 
 if __name__ == "__main__":
     main()
