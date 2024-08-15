@@ -58,7 +58,7 @@ class chatBotMode:
                 expanded_context = retriever.expand_context(file_name_remove_accents, doc.page_content)
                 expanded_contexts.append(expanded_context)
 
-            context = "\n".join(expanded_contexts)
+            context = "\n SEPARATED \n".join(expanded_contexts)
 
             prompt = set_custom_prompt()
 
