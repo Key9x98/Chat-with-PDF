@@ -49,11 +49,15 @@ class TextProcessor:
         nfkd_form = unicodedata.normalize('NFKD', input_str)
         return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
 
-    def format_context(self,context):
-        '''
-        :param contetx:
-        :return: context sau khi re-format
-        mục đích: hiển thị ra gọn hơn, dễ đọc hơn
-        '''
-        return context
+    def format_context(self, context):
+        parts = context.split("SEPARATED")
+        if len(parts) != 2:
+            return context
+
+        formatted_parts = []
+        for part in parts:
+            formatted_part = re.sub(r'(\d+\.\d*(?:\.\d+)*\s+[A-Z\s]+)', r'<br><br>\1', part)
+            formatted_parts.append(formatted_part.strip())
+
+        return "<br><br>---------------------------------Context khác---------------------------------<br><br>".join(formatted_parts)
 
