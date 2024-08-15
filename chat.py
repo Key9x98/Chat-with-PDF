@@ -44,12 +44,14 @@ safety_settings = [
 ]
 
 
-custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm vụ là tổng hợp thông tin trong Context để trả lời câu hỏi
+custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm vụ là tổng hợp thông tin trong các đoạn Context để trả lời câu hỏi, các
+chỉ mục đánh số dưới đây là các yêu cầu và mô tả cụ thể:
 1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời "Tôi không có đủ thông tin để trả lời câu hỏi này. Vui lòng cung cấp thêm thông tin liên quan đến câu hỏi."
 2. Không suy đoán và bịa đặt nội dung ngoài
-3. Chỉ trả lời thông tin theo Context tìm được, một cách đầy đủ 
-4. Sử dụng tiếng việt
-5. Chỉ sử dụng History khi người dùng hỏi về câu hỏi trước đó:
+3. Chỉ trả lời thông tin theo Context tìm được, trả lời đầy đủ thông tin liên quan đến câu hỏi
+4. Thông tin thường chỉ nằm trong một đoạn context, các đoạn context được chia cách bởi chuỗi SEPARATED
+5. Sử dụng tiếng việt
+6. Chỉ sử dụng History khi người dùng hỏi về câu hỏi trước đó:
  History: {history_global},
 Context: {context},
 Question: {question}
