@@ -44,9 +44,9 @@ safety_settings = [
 custom_prompt_template = """Yêu cầu cụ thể là tổng hợp thông tin trong các đoạn Context để trả lời câu hỏi, các
 chỉ mục đánh số dưới đây là các mô tả nhiệm vụ:
 1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời "Tôi không có đủ thông tin để trả lời câu hỏi này. Vui lòng cung cấp thêm thông tin liên quan đến câu hỏi."
-2. Không suy đoán và bịa đặt nội dung ngoài
-3. Chỉ trả lời thông tin theo Context tìm được, trả lời đầy đủ thông tin liên quan đến câu hỏi
-4. Thông tin thường chỉ nằm trong một đoạn context, các đoạn context được chia cách bởi chuỗi SEPARATED
+2. Không suy đoán và bịa đặt nội dung ngoài.
+3. Chỉ trả lời thông tin theo Context tìm được, trả lời đầy đủ thông tin liên quan đến câu hỏi, bao gồm cả việc liệt kê các ý nhỏ nếu cần.
+4. Thông tin thường chỉ nằm trong một đoạn context, các đoạn context được chia cách bởi chuỗi "SEPARATED".
 5. Chỉ sử dụng History khi người dùng hỏi về câu hỏi trước đó:
  History: {history_global},
 Context: {context},
@@ -88,9 +88,9 @@ class GeminiBot:
 
   def _setup(self):
     genai.configure(api_key=GOOGLE_API_KEY)
-    INSTRUCTION = ('Bạn là một hệ thống hỏi đáp, hãy trả lời các câu hỏi của người dùng bằng tiếng Việt.'
+    INSTRUCTION = ('Bạn là một công cụ hỏi đáp, hãy trả lời các câu hỏi của người dùng bằng tiếng Việt.'
               'Khi kết thúc trả lời hãy hỏi "\n\n Nếu bạn cần thêm điều gì, hãy cho tôi biết!" hoặc những câu tương tự.'
-              'Nhưng yêu cầu cụ thể sẽ được mô tả, hãy làm theo các yêu cầu đó.')
+              'Người dùng sẽ có thêm những mô tả cụ thể, hãy làm theo những yêu cầu đó.')
     self.model = genai.GenerativeModel(model_name=self.model_name,
                                        generation_config=generation_config,
                                        safety_settings=safety_settings,
