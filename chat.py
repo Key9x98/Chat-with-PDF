@@ -57,7 +57,7 @@ Câu trả lời:
 
 new_prompt_template = '''
 Yêu cầu:
-* Dựa trên thông tin trong các đoạn văn bản Context (phân cách bởi "SEPARATED"), hãy trả lời câu hỏi một cách chính xác và đầy đủ.
+* Dựa trên thông tin trong các đoạn văn bản Context (phân cách bởi "SEPARATED"), hãy trả lời đầy đủ các thông tin liên quan đến câu hỏi.
 * Không suy đoán hay thêm thông tin không có trong văn bản.
 * Nếu câu trả lời không có trong văn bản hoặc không đủ rõ ràng, hãy trả lời: "Tôi không đủ thông tin để trả lời câu hỏi này."
 
