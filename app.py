@@ -221,15 +221,12 @@ def main():
 import shutil
 def clean_data():
     try:
-        # Xóa thư mục vectorstores
         if os.path.exists("vectorstores"):
             shutil.rmtree("vectorstores")
-
-        # Xóa thư mục original_text
+            
         if os.path.exists("original_text"):
             shutil.rmtree("original_text")
 
-        # Xóa các biến session state
         for key in list(st.session_state.keys()):
             del st.session_state[key]
 
@@ -239,7 +236,6 @@ def clean_data():
         st.rerun()
     except Exception as e:
         st.error(f"Có lỗi xảy ra khi dọn dẹp dữ liệu: {str(e)}")
-
 
 if __name__ == "__main__":
     main()
