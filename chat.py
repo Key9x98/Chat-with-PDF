@@ -58,8 +58,10 @@ Câu trả lời:
 new_prompt_template = '''
 Yêu cầu:
 * Dựa trên thông tin trong các đoạn văn bản Context (phân cách bởi "SEPARATED"), hãy trả lời đầy đủ các thông tin liên quan đến câu hỏi.
-* Không suy đoán hay thêm thông tin không có trong văn bản.
+* Câu hỏi có thể cần liệt kê. 
+* Không suy đoán và bịa đặt nội dung ngoài
 * Nếu câu trả lời không có trong văn bản hoặc không đủ rõ ràng, hãy trả lời: "Tôi không đủ thông tin để trả lời câu hỏi này."
+* History có thể được sử dụng để trả lời câu hỏi.
 
 History: {history_global},
 Context: {context},
@@ -86,9 +88,9 @@ class GeminiBot:
 
   def _setup(self):
     genai.configure(api_key=GOOGLE_API_KEY)
-    INSTRUCTION = ('Bạn là một công cụ chat, hãy trả lời các câu hỏi của người dùng bằng tiếng Việt.'
+    INSTRUCTION = ('Bạn là một hệ thống hỏi đáp, hãy trả lời các câu hỏi của người dùng bằng tiếng Việt.'
               'Khi kết thúc trả lời hãy hỏi "\n\n Nếu bạn cần thêm điều gì, hãy cho tôi biết!" hoặc những câu tương tự.'
-              ' Hãy làm theo yêu cầu cụ thể')
+              'Nhưng yêu cầu cụ thể sẽ được mô tả, hãy làm theo các yêu cầu đó.')
     self.model = genai.GenerativeModel(model_name=self.model_name,
                                        generation_config=generation_config,
                                        safety_settings=safety_settings,
