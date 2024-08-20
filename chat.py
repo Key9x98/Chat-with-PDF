@@ -2,20 +2,17 @@ import google.generativeai as genai
 import os
 import streamlit as st
 from langchain_core.prompts import PromptTemplate
-
 from dotenv import load_dotenv
 
-# Load .env file
+# Chạy Local
+# Cách viết .env: xem file .envexalmple
 # load_dotenv()
 # GOOGLE_API_KEY = os.getenv("API_KEY")
 # MODEL_NAME =  os.getenv("MODEL_NAME")
 
-# chạy trên streamlit: thêm 2 trường ở config
+# Chạy trên Streamlit: thêm 2 trường ở config
 GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 MODEL_NAME = st.secrets["MODEL_NAME"]
-
-
-print(MODEL_NAME)
 
 generation_config = {
   "temperature": 0.05,
@@ -44,14 +41,13 @@ safety_settings = [
 ]
 
 
-custom_prompt_template = """Bạn là một hệ thống hỏi đáp, nhiệm vụ là tổng hợp thông tin trong các đoạn Context để trả lời câu hỏi, các
-chỉ mục đánh số dưới đây là các yêu cầu và mô tả cụ thể:
+custom_prompt_template = """Yêu cầu cụ thể là tổng hợp thông tin trong các đoạn Context để trả lời câu hỏi, các
+chỉ mục đánh số dưới đây là các mô tả nhiệm vụ:
 1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời "Tôi không có đủ thông tin để trả lời câu hỏi này. Vui lòng cung cấp thêm thông tin liên quan đến câu hỏi."
 2. Không suy đoán và bịa đặt nội dung ngoài
 3. Chỉ trả lời thông tin theo Context tìm được, trả lời đầy đủ thông tin liên quan đến câu hỏi
 4. Thông tin thường chỉ nằm trong một đoạn context, các đoạn context được chia cách bởi chuỗi SEPARATED
-5. Sử dụng tiếng việt
-6. Chỉ sử dụng History khi người dùng hỏi về câu hỏi trước đó:
+5. Chỉ sử dụng History khi người dùng hỏi về câu hỏi trước đó:
  History: {history_global},
 Context: {context},
 Question: {question}
@@ -59,12 +55,24 @@ Question: {question}
 Câu trả lời:
 """
 
+new_prompt_template = '''
+Yêu cầu:
+* Dựa trên thông tin trong các đoạn văn bản Context (phân cách bởi "SEPARATED"), hãy trả lời câu hỏi một cách chính xác và đầy đủ.
+* Không suy đoán hay thêm thông tin không có trong văn bản.
+* Nếu câu trả lời không có trong văn bản hoặc không đủ rõ ràng, hãy trả lời: "Tôi không đủ thông tin để trả lời câu hỏi này."
+
+History: {history_global},
+Context: {context},
+Câu hỏi: {question}
+
+Câu trả lời:
+'''
 
 def set_custom_prompt():
   """
   Prompt template for QA retrieval for each vectorstore
   """
-  prompt = PromptTemplate(template=custom_prompt_template,
+  prompt = PromptTemplate(template=new_prompt_template,
                           input_variables=['history_global','context', 'question'])
   return prompt
 
@@ -78,30 +86,20 @@ class GeminiBot:
 
   def _setup(self):
     genai.configure(api_key=GOOGLE_API_KEY)
-    PROMPT = 'Ban là một công cụ chat, hãy trả lời các câu hỏi của người dùng'
+    INSTRUCTION = ('Bạn là một công cụ chat, hãy trả lời các câu hỏi của người dùng bằng tiếng Việt.'
+              'Khi kết thúc trả lời hãy hỏi "\n\n Nếu bạn cần thêm điều gì, hãy cho tôi biết!" hoặc những câu tương tự.'
+              ' Hãy làm theo yêu cầu cụ thể')
     self.model = genai.GenerativeModel(model_name=self.model_name,
                                        generation_config=generation_config,
-                                       safety_settings=safety_settings)
-                                       # system_instruction=PROMPT)
-    self.token_count = self.model.count_tokens(PROMPT).total_tokens
+                                       safety_settings=safety_settings,
+                                       system_instruction=INSTRUCTION)
     self.chat = self.model.start_chat()
 
 
   def response(self, user_input):
     user_input = user_input
-    
-    input_tokens = self.model.count_tokens(user_input).total_tokens
-
-    if self.token_count > 1000000:
-      return "Out of tokens"
-
     response = self.chat.send_message(user_input)
-    self.token_count += input_tokens + self.model.count_tokens(response.text).total_tokens
-    
     return response.text
 
 
 gemini_bot = GeminiBot()
-# user_question = "1 + 1 bằng mấy"
-# bot_response = gemini_bot.response(user_question)
-# print(bot_response)
