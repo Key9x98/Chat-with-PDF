@@ -30,11 +30,9 @@ def main():
 
     st.markdown(
     """
-    <style>
-    .css-1n543e5 a {  /* This targets the anchor tag for the GitHub logo */
-        display: none;
+    #GithubIcon {
+      visibility: hidden;
     }
-    </style>
     """,
     unsafe_allow_html=True
     )
