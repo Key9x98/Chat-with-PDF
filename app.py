@@ -145,8 +145,9 @@ def main():
                 if selected_dbs:
                     temp_vector_db = st.session_state.chat_bot.vector_db
                     st.session_state.chat_bot.vector_db = selected_dbs
-                    # print(st.session_state.chat_bot.vector_db)
-                    response, context = st.session_state.chat_bot.process_question(user_question)
+                    
+                    with st.spinner("🧐🧐🧐 thinking..."):
+                        response, context = st.session_state.chat_bot.process_question(user_question)
 
                     st.session_state.chat_bot.vector_db = temp_vector_db
 
@@ -172,7 +173,8 @@ def main():
                 st.warning("Please upload your files first, we will use them to answer.")
         else:
             st.session_state.current_context = ""
-            response = st.session_state.chat_bot.process_question(user_question)
+            with st.spinner("🧐🧐🧐 thinking..."):
+                response = st.session_state.chat_bot.process_question(user_question)
             display_response = text_processor.remove_markdown(response)
             with st.chat_message('assistant'):
                 message_placeholder = st.empty()
