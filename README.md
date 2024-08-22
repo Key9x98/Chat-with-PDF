@@ -22,3 +22,4 @@ Nếu là người sử dụng hoặc chỉ đơn giản là thử nghiệm hi�
 - [Chunking Techniques](https://medium.com/@thallyscostalat/chunking-strategies-optimization-for-retrieval-augmented-generation-rag-in-the-context-of-e47cc949931d).
 - [Enhance Search Engine for RAG](https://www.linkedin.com/pulse/retrieval-augmented-generation-guide-effective-search-mike-callahan-edldc/)
 - [Semantic Router for RAG - Google Expert Nguyễn Bá Ngọc](https://github.com/bangoc123/retrieval-backend-with-rag).
+- [RAG techniques](https://github.com/NirDiamant/RAG_Techniques?fbclid=IwY2xjawEzh_NleHRuA2FlbQIxMAABHYausPSip4Z1MyJBelVwIK8386fed-qcF3wf6AYYISMCbfWyUqXcAEpZtw_aem_2kJ9kfdbAhk7Wd_WtX_onw)
