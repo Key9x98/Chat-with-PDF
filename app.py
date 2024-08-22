@@ -29,17 +29,16 @@ def main():
             clean_data()
 
     st.markdown(
-        """
-        <style>
-        .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
-        .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
-        .viewerBadge_text__1JaDK {
-            display: none;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
+    """
+    <style>
+    .css-1n543e5 a {  /* This targets the anchor tag for the GitHub logo */
+        display: none;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
     )
+
 
     user_question = st.chat_input("Ask a Question from the PDF Files")
 
