@@ -16,6 +16,24 @@ text_processor = TextProcessor()
 manager = PDFDatabaseManager(pdf_data_path, vector_db_path, hash_store_path)
 retriever = ContextRetriever("original_text")
 
+def hide_elements():
+    hide_elements_style = """
+    <style>
+    /* Hide the GitHub icon */
+    .viewerBadge_container__1QSob {
+        display: none !important;
+    }
+    /* Hide the header */
+    header {
+        visibility: hidden !important;
+    }
+    /* Hide the footer */
+    footer {
+        visibility: hidden !important;
+    }
+    </style>
+    """
+    st.markdown(hide_elements_style, unsafe_allow_html=True)
 
 def main():
     st.set_page_config(page_title="ChatPDF", page_icon='🤖')
@@ -28,20 +46,7 @@ def main():
         if st.button("🧹", help="Clean data and reload"):
             clean_data()
 
-    st.markdown(
-    """
-    <style>
-    .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
-    .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
-    .viewerBadge_text__1JaDK {
-        display: none !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-    )
-
-
+    hide_elements()
 
     user_question = st.chat_input("Ask a Question from the PDF Files")
 
