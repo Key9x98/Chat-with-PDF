@@ -37,7 +37,7 @@ def hide_elements():
 
 def main():
     st.set_page_config(page_title="ChatPDF", page_icon='🤖')
-    col1, col2 = st.columns([0.6, 0.4])  # Tạo hai cột với tỉ lệ 9:1
+    col1, col2 = st.columns([0.6, 0.4])
 
     with col1:
         st.header("Vietnamese PDF Chat")
@@ -138,43 +138,35 @@ def main():
 
         response = None
         context = None
-        if st.session_state.chat_bot.mode == "pdf_query":
-            if st.session_state.vector_db:
-                selected_dbs = {pdf: st.session_state.vector_db[pdf] for pdf in st.session_state.selected_pdfs if
-                                pdf in st.session_state.vector_db}
-                if selected_dbs:
-                    temp_vector_db = st.session_state.chat_bot.vector_db
-                    st.session_state.chat_bot.vector_db = selected_dbs
-                    
-                    with st.spinner("🧐🧐🧐 thinking..."):
-                        response, context = st.session_state.chat_bot.process_question(user_question)
 
-                    st.session_state.chat_bot.vector_db = temp_vector_db
 
-                    display_response = text_processor.remove_markdown(response)
-                    with st.chat_message('assistant'):
-                        message_placeholder = st.empty()
-                        full_response = ""
-                        for chunk in display_response.split():
-                            full_response += chunk + " "
-                            time.sleep(0.04)
-                            message_placeholder.write(full_response + "▌")
-                        time.sleep(0.1)
-                        final_message = "**Answer extracted from the document:**\n\n" + response
-                        message_placeholder.markdown(final_message)
-                        with st.expander("Show Context", expanded=False):
-                            formatted_context = text_processor.format_context(context)
-                            st.markdown(formatted_context, unsafe_allow_html=True)
+        with st.container():
+            # Đẩy lùi spinner vào trong
+            left_spacer, right_content = st.columns([0.06, 0.94])
+            with right_content:
+                with st.spinner("🧐🧐🧐 thinking..."):
+                    if st.session_state.chat_bot.mode == "pdf_query":
+                        if st.session_state.vector_db:
+                            selected_dbs = {pdf: st.session_state.vector_db[pdf] for pdf in
+                                            st.session_state.selected_pdfs if
+                                            pdf in st.session_state.vector_db}
+                            if selected_dbs:
+                                temp_vector_db = st.session_state.chat_bot.vector_db
+                                st.session_state.chat_bot.vector_db = selected_dbs
 
-                        st.session_state.current_context = context
-                else:
-                    st.warning("Please select at least one PDF to query.")
-            else:
-                st.warning("Please upload your files first, we will use them to answer.")
-        else:
-            st.session_state.current_context = ""
-            with st.spinner("🧐🧐🧐 thinking..."):
-                response = st.session_state.chat_bot.process_question(user_question)
+                                response, context = st.session_state.chat_bot.process_question(user_question)
+
+                                st.session_state.chat_bot.vector_db = temp_vector_db
+                                st.session_state.current_context = context
+                            else:
+                                st.warning("Please select at least one PDF to query.")
+                        else:
+                            st.warning("Please upload your files first, we will use them to answer.")
+                    else:
+                        st.session_state.current_context = ""
+                        response = st.session_state.chat_bot.process_question(user_question)
+
+        if response:
             display_response = text_processor.remove_markdown(response)
             with st.chat_message('assistant'):
                 message_placeholder = st.empty()
@@ -184,10 +176,19 @@ def main():
                     time.sleep(0.04)
                     message_placeholder.write(full_response + "▌")
                 time.sleep(0.1)
-                message_placeholder.markdown(response + "\n")
+                if st.session_state.chat_bot.mode == "pdf_query":
+                    final_message = "**Answer extracted from the document:**\n\n" + response
+                else:
+                    final_message = response
+                message_placeholder.markdown(final_message)
 
-        st.session_state.messages.append({"role": "user", "content": user_question})
-        st.session_state.messages.append({"role": "assistant", "content": response})
+            if context:
+                with st.expander("Show Context", expanded=False):
+                    formatted_context = text_processor.format_context(context)
+                    st.markdown(formatted_context, unsafe_allow_html=True)
+
+            st.session_state.messages.append({"role": "user", "content": user_question})
+            st.session_state.messages.append({"role": "assistant", "content": response})
 
     if st.session_state.messages:
         last_message = st.session_state.messages[-1]
@@ -197,8 +198,11 @@ def main():
                 last_message.get("content") and
                 not any(last_message["content"].strip().endswith(punct) for punct in end_punctuation)):
 
-            # Tạo nút "Generate more" bên ngoài chat_message
-            generate_more = st.button("Generate more", key=f"generate_more_{len(st.session_state.messages)}")
+            # Tạo container bọc nút generate more
+            with st.container():
+                left_spacer, right_content = st.columns([0.06, 0.94])
+                with right_content:
+                    generate_more = st.button("Generate more", key=f"generate_more_{len(st.session_state.messages)}")
 
             if generate_more:
                 context = st.session_state.current_context
@@ -216,14 +220,16 @@ def main():
                 display_continuation = text_processor.remove_markdown(continuation)
 
                 with st.container():
-                    message_placeholder = st.empty()
-                    full_continuation = ""
-                    for chunk in display_continuation.split():
-                        full_continuation += chunk + " "
-                        time.sleep(0.05)
-                        message_placeholder.write(full_continuation + "▌", unsafe_allow_html=True)
-                    time.sleep(0.1)
-                    message_placeholder.markdown(continuation + "\n", unsafe_allow_html=True)
+                    left_spacer, right_content = st.columns([0.06, 0.94])
+                    with right_content:
+                        message_placeholder = st.empty()
+                        full_continuation = ""
+                        for chunk in display_continuation.split():
+                            full_continuation += chunk + " "
+                            time.sleep(0.05)
+                            message_placeholder.write(full_continuation + "▌", unsafe_allow_html=True)
+                        time.sleep(0.1)
+                        message_placeholder.markdown(continuation + "\n", unsafe_allow_html=True)
 
                 st.session_state.messages.append({"role": "assistant", "content": continuation})
 
