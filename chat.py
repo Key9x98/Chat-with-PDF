@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 # GOOGLE_API_KEY = os.getenv("API_KEY")
 # MODEL_NAME =  os.getenv("MODEL_NAME")
 
-# Chạy trên Streamlit: thêm 2 trường ở config
+# # Chạy trên Streamlit: thêm 2 trường ở config
 GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 MODEL_NAME = st.secrets["MODEL_NAME"]
 
@@ -18,7 +18,7 @@ generation_config = {
   "temperature": 0.05,
   "top_p": 1,
   "top_k": 1,
-  "max_output_tokens": 2048,
+  "max_output_tokens": 1000,
 }
 
 safety_settings = [
@@ -40,16 +40,26 @@ safety_settings = [
   },
 ]
 
+custom_prompt_template = """
+Yêu cầu cụ thể là tổng hợp thông tin trong các đoạn Context để trả lời câu hỏi. 
+Các chỉ mục đánh số dưới đây là các mô tả nhiệm vụ:
 
-custom_prompt_template = """Yêu cầu cụ thể là tổng hợp thông tin trong các đoạn Context để trả lời câu hỏi, các
-chỉ mục đánh số dưới đây là các mô tả nhiệm vụ:
-1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời "Tôi không có đủ thông tin để trả lời câu hỏi này. Vui lòng cung cấp thêm thông tin liên quan đến câu hỏi."
+1. Nếu câu trả lời không có trong Context hoặc bạn không chắc chắn, hãy trả lời: 
+   "Tôi không có đủ thông tin để trả lời câu hỏi này. Vui lòng cung cấp thêm thông tin liên quan đến câu hỏi."
+
 2. Không suy đoán và bịa đặt nội dung ngoài.
-3. Chỉ trả lời thông tin theo Context tìm được, trả lời đầy đủ thông tin liên quan đến câu hỏi, bao gồm cả việc liệt kê các ý nhỏ nếu cần.
-4. Thông tin thường chỉ nằm trong một đoạn context, các đoạn context được chia cách bởi chuỗi "SEPARATED".
+
+3. Chỉ trả lời thông tin theo Context tìm được. Trả lời đầy đủ thông tin liên quan đến câu hỏi, 
+   bao gồm cả việc liệt kê các ý nhỏ nếu cần.
+
+4. Thông tin thường chỉ nằm trong một đoạn context. Các đoạn context được chia cách bởi chuỗi "SEPARATED".
+
 5. Chỉ sử dụng History khi người dùng hỏi về câu hỏi trước đó:
- History: {history_global},
-Context: {context},
+
+History: {history_global}
+
+Context: {context}
+
 Question: {question}
 
 Câu trả lời:
