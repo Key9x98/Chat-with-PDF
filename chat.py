@@ -65,25 +65,7 @@ Question: {question}
 Câu trả lời:
 """
 
-new_prompt_template = '''
-Yêu cầu:
-* Dựa trên thông tin trong các đoạn văn bản Context (phân cách bởi "SEPARATED"), hãy trả lời đầy đủ các thông tin liên quan đến câu hỏi.
-* Câu hỏi có thể cần liệt kê. 
-* Không suy đoán và bịa đặt nội dung ngoài
-* Nếu câu trả lời không có trong văn bản hoặc không đủ rõ ràng, hãy trả lời: "Tôi không đủ thông tin để trả lời câu hỏi này."
-* History có thể được sử dụng để trả lời câu hỏi.
-
-History: {history_global},
-Context: {context},
-Câu hỏi: {question}
-
-Câu trả lời:
-'''
-
 def set_custom_prompt():
-  """
-  Prompt template for QA retrieval for each vectorstore
-  """
   prompt = PromptTemplate(template=custom_prompt_template,
                           input_variables=['history_global','context', 'question'])
   return prompt
