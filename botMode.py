@@ -77,7 +77,7 @@ class chatBotMode:
             response = gemini_bot.response(prompt_with_context)
 
             # Thêm thông tin về nguồn
-            sources = [f"{meta['source_db']} ({retriever.get_file_name(meta)})" for meta in metadatas]
+            sources = [f"{meta['source_db']} " for meta in metadatas]
             response_with_sources = f"Nguồn: {', '.join(set(sources))}. \n\n {response}"
 
             return response_with_sources, context
